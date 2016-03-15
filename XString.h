@@ -19,6 +19,8 @@ public:
 
 	char* data() const;
 
+	int getSize() const;
+
 	void print() const;
 
 private:

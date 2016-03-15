@@ -87,20 +87,19 @@ public:
 
 	bool append(const XArray<T>& p_otherArr)
 	{
-
-
-		return true;
-	}
-
-	bool append(XArray<T>&& p_otherArr)
-	{
-		
-		return true;
+		return append(p_otherArr.m_firstElement, p_otherArr.m_arraySize);
 	}
 
 	bool append(const T* p_otherArr, int p_numEle)
 	{
+		if (m_arraySize + p_numEle > m_maxArraySize)
+		{
+			int countToAdd = (m_arraySize + p_numEle) - m_maxArraySize;
+			addUninitializedElements(countToAdd);
+		}
 
+		memcpy(m_firstElement + m_arraySize, p_otherArr, p_numEle * sizeof(T));
+		m_arraySize += p_numEle;
 
 		return true;
 	}
@@ -109,16 +108,7 @@ public:
 	{
 		if (m_arraySize + 1 > m_maxArraySize)
 		{
-			m_maxArraySize++;
-			T* newArrayPtr = (T*) realloc(m_firstElement, m_maxArraySize * sizeof(T));
-
-			if (newArrayPtr == nullptr)
-			{
-				// TODO: throw exception and log
-				return 0;
-			}
-
-			m_firstElement = newArrayPtr;
+			addUninitializedElements(1);
 		}
 
 		m_firstElement[m_arraySize] = p_element;
@@ -128,7 +118,7 @@ public:
 
 	int add(const T&& p_element)
 	{
-		add(p_element);
+		add(p_element); // TODO: do it correct
 		return 1;
 	}
 
@@ -232,6 +222,20 @@ public:
 	}
 
 private:
+
+	void addUninitializedElements(int p_numEle)
+	{
+		m_maxArraySize += p_numEle;
+		T* newArrayPtr = (T*)realloc(m_firstElement, m_maxArraySize * sizeof(T));
+
+		if (newArrayPtr == nullptr)
+		{
+			// TODO: throw exception and log
+			return;
+		}
+
+		m_firstElement = newArrayPtr;
+	}
 
 	T* m_firstElement = nullptr;
 

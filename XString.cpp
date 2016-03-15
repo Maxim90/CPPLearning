@@ -8,9 +8,8 @@ XString::XString()
 
 XString::XString(char* p_string)
 {
-	std::cout << "calling XString(char* p_string)" << std::endl;
 	XArray<char> tmp{ p_string, (int)strlen(p_string) + 1 };
-	m_string.operator=( XArray<char>{ p_string, (int)strlen(p_string) + 1 }); // for some reason first element ptr is only copying the ptr
+	m_string = tmp;
 }
 
 XString::~XString()
@@ -25,11 +24,15 @@ XString& XString::operator=(XString& p_string)
 
 XString& XString::operator=(char* p_string)
 {
-	std::cout << "calling XString::operator=" << std::endl;
 	XArray<char> tmp{ p_string, (int)strlen(p_string) + 1 };
 	m_string = tmp;
 
 	return *this;
+}
+
+int XString::getSize() const
+{
+	return m_string.getSize() - 1; // we do not want the \0
 }
 
 char* XString::data() const
