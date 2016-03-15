@@ -9,7 +9,9 @@ public:
 
 	XArray()
 	{
-
+		m_firstElement = nullptr;
+		m_arraySize = 0;
+		m_maxArraySize = 0;
 	}
 
 	XArray(int p_initialSize)
@@ -38,12 +40,6 @@ public:
 		memcpy(m_firstElement, p_otherArr, m_arraySize * sizeof(T));
 	}
 
-	XArray(const T*&& p_otherArr, int p_numEle) : XArray(p_numEle)
-	{
-		m_arraySize = m_maxArraySize;
-		memcpy(m_firstElement, p_otherArr, m_arraySize * sizeof(T));
-	}
-
 	virtual ~XArray()
 	{
 		free(m_firstElement);
@@ -52,39 +48,39 @@ public:
 		m_maxArraySize = 0;
 	}
 
-	T& operator=(const T& p_otherArr) // copy assignment
+	XArray<T>& operator=(const XArray<T>& p_otherArr) // copy assignment
 	{
 		std::cout << "using: " << "T& operator=(const T& p_otherArr)" << std::endl;
-		if (&p_otherArr == this) return;
+		if (&p_otherArr == this) return *this;
 
-		if (m_maxArraySize < p_otherArr.MaxArraySize)
+		if (m_maxArraySize < p_otherArr.m_maxArraySize)
 		{
-			m_maxArraySize = p_otherArr.MaxArraySize;
+			m_maxArraySize = p_otherArr.m_maxArraySize;
 
 			T* newArrayPtr = (T*)realloc(m_firstElement, m_maxArraySize * sizeof(T));
 			if (newArrayPtr == nullptr)
 			{
 				// TODO: throw exception and log
-				return 0;
+				return *this;
 			}
 
 			m_firstElement = newArrayPtr;
 		}
 
-		m_arraySize = p_otherArr.ArraySize;
-		memcpy(m_firstElement, p_otherArr.firstElement, m_arraySize * sizeof(T));
+		m_arraySize = p_otherArr.m_arraySize;
+		memcpy(m_firstElement, p_otherArr.m_firstElement, m_arraySize * sizeof(T));
 
 		return *this;
 	}
 
-	T& operator=(T&& p_otherArr) // move assignment
+	XArray<T>& operator=(XArray<T>&& p_otherArr) // move assignment
 	{
 		std::cout << "using: " << "T& operator=(T&& p_otherArr)" << std::endl;
 		free(m_firstElement);
-		m_maxArraySize = p_otherArr.MaxArraySize;
-		m_arraySize = p_otherArr.ArraySize;
-		m_firstElement = p_otherArr.firstElement;
-		p_otherArr.firstElement = nullptr;
+		m_maxArraySize = p_otherArr.m_maxArraySize;
+		m_arraySize = p_otherArr.m_arraySize;
+		m_firstElement = p_otherArr.m_firstElement;
+		p_otherArr.m_firstElement = nullptr;
 
 		return *this;
 	}

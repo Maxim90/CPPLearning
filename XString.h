@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../../GoogleCalendarQT/GoogleCalendarQT/XArray.h"
+#include "XArray.h"
 
 class XString
 {
@@ -23,7 +23,7 @@ public:
 
 private:
 
-	XArray<char> m_string{"wdasdas", 8};
+	XArray<char> m_string;
 };
 
 static std::ostream& operator<<(std::ostream& p_out, const XString& p_string)
