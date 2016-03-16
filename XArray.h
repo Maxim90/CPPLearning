@@ -16,6 +16,8 @@ public:
 
 	XArray(int p_initialSize)
 	{
+		if (p_initialSize <= 0) return; // TODO: throw exception
+
 		m_maxArraySize = p_initialSize;
 		m_firstElement = (T*)malloc(m_maxArraySize * sizeof(T));
 	}
@@ -31,18 +33,22 @@ public:
 		m_maxArraySize = p_otherArr.m_maxArraySize;
 		m_arraySize = p_otherArr.m_arraySize;
 		m_firstElement = p_otherArr.m_firstElement;
+
+		// clean other array
 		p_otherArr.m_firstElement = nullptr;
+		p_otherArr.m_arraySize = 0;
+		p_otherArr.m_maxArraySize = 0;
 	}
 
 	XArray(const T* p_otherArr, int p_numEle) : XArray(p_numEle)
 	{
-		m_arraySize = m_maxArraySize;
+		m_arraySize = p_numEle;
 		memcpy(m_firstElement, p_otherArr, m_arraySize * sizeof(T));
 	}
 
 	virtual ~XArray()
 	{
-		free(m_firstElement);
+		free(m_firstElement); // call destructor of each object???
 		m_firstElement = nullptr;
 		m_arraySize = 0;
 		m_maxArraySize = 0;
@@ -55,16 +61,7 @@ public:
 
 		if (m_maxArraySize < p_otherArr.m_maxArraySize)
 		{
-			m_maxArraySize = p_otherArr.m_maxArraySize;
-
-			T* newArrayPtr = (T*)realloc(m_firstElement, m_maxArraySize * sizeof(T));
-			if (newArrayPtr == nullptr)
-			{
-				// TODO: throw exception and log
-				return *this;
-			}
-
-			m_firstElement = newArrayPtr;
+			resize(p_otherArr.m_maxArraySize);
 		}
 
 		m_arraySize = p_otherArr.m_arraySize;
@@ -142,16 +139,7 @@ public:
 
  		if (p_shrink)
  		{
- 			m_maxArraySize--;
-			T* newArrayPtr = (T*) realloc(m_firstElement, m_maxArraySize * sizeof(T));
-
-			if (newArrayPtr == nullptr)
-			{
-				// TODO: throw exception and log
-				return 0;
-			}
-
-			m_firstElement = newArrayPtr;
+			resize(m_arraySize);
  		}
 
 		return 1;
@@ -225,16 +213,25 @@ private:
 
 	void addUninitializedElements(int p_numEle)
 	{
-		m_maxArraySize += p_numEle;
-		T* newArrayPtr = (T*)realloc(m_firstElement, m_maxArraySize * sizeof(T));
+		resize(m_maxArraySize + p_numEle);
+	}
 
+	void resize(int p_newSize)
+	{
+		if (m_maxArraySize == 0)
+		{
+			m_maxArraySize = p_newSize;
+			m_firstElement = (T*)malloc(m_maxArraySize * sizeof(T));
+			return;
+		}
+
+		m_maxArraySize = p_newSize;
+		T* newArrayPtr = (T*)realloc(m_firstElement, m_maxArraySize * sizeof(T));
 		if (newArrayPtr == nullptr)
 		{
 			// TODO: throw exception and log
 			return;
 		}
-
-		m_firstElement = newArrayPtr;
 	}
 
 	T* m_firstElement = nullptr;
